@@ -1,6 +1,8 @@
-{
+  {
   "name": "quiz-backend",
   "version": "1.0.0",
+  "description": "Quiz results backend",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
