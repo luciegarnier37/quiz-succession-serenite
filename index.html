@@ -632,12 +632,7 @@
                 console.log('Réponse du serveur:', data);
                 
                 // Vérifier si la réponse est correcte
-                if (!data.result || !data.result.data || !data.result.data.success) {
-                    console.error('Erreur lors de l\'envoi des données');
-                }
-            } catch (error) {
-                console.error('Erreur lors de l\'envoi:', error);
-            }
+                
             
             // Calculer et afficher le profil
             const profile = calculateProfile();
