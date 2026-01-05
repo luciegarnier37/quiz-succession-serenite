@@ -419,7 +419,7 @@
                         🚫 Non, pas pour le moment
                     </div>
                 </div>
-                <button class="btn" id="next7" onclick="nextQuestion(7)" disabled>Voir mes résultats</button>
+                <button class="btn" id="next7" oonclick="showResult()" disabled>Voir mes résultats</button>
             </div>
             <div id="resultPage" class="page hidden">
     <h2>Votre profil succession</h2>
@@ -555,6 +555,10 @@
             } else {
                 showPage('contact');
             }
+            function showResult() {
+    document.getElementById('resultText').innerHTML = "✅ Profil calculé ! RDV prioritaire.";
+    showPage('resultPage');
+}
         }
 
         function calculateProfile() {
@@ -628,17 +632,10 @@
         function bookConsultation() {
             window.location.href = 'https://cal.com/lucie-garnier-immobilier/rendez-vous-succession-quiz';
         }
- function showResult() {
-            const score = parseInt(localStorage.getItem('quizScore') || 0);
-            let profil = score <=7 ? "PRUDENT" : score<=14 ? "ÉQUILIBRÉ" : "COMPLEXE";
-            document.getElementById('resultText').innerHTML = 
-                `Profil <strong>${profil}</strong> ! Action prioritaire.`;
-            showPage('resultPage');
-        }
+ 
 
         // Initialisation
         updateProgress();
-             }); 
     </script>
 </body>
 </html>
