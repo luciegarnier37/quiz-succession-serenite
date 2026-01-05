@@ -610,15 +610,23 @@
   const res = await fetch('https://quiz-succession-serenite.onrender.com/results', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(formData)  // ou tes données
+    body: JSON.stringify({
+      json: {
+        fullName: fullName,  // ← tes variables
+        phone: phone,
+        q1: answers.q1,
+        q2: answers.q2,
+        // ... copie tes réponses existantes
+      }
+    })
   });
   
   if (!res.ok) throw new Error('Serveur ' + res.status);
-  const data = await res.json();
-  console.log('✅ OK:', data);
+  console.log('✅ OK');
 } catch (error) {
   console.error('Offline OK:', error);
-};
+}
+
                   } catch (error) {
             console.error('Backend OK local:', error);
         }
