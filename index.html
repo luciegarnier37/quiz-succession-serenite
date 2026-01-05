@@ -606,35 +606,32 @@
             const address = document.getElementById('address').value;
             
             // Envoyer les données au backend
-            try {
+          try {
   const res = await fetch('https://quiz-succession-serenite.onrender.com/results', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
       json: {
-        fullName: fullName,  // ← tes variables
+        fullName: fullName,
         phone: phone,
         q1: answers.q1,
         q2: answers.q2,
-        // ... copie tes réponses existantes
+        q3: answers.q3,
+        q4: answers.q4,
+        q5: answers.q5,
+        q6: answers.q6,
+        q7: answers.q7
       }
     })
   });
-  
+
   if (!res.ok) throw new Error('Serveur ' + res.status);
-  console.log('✅ OK');
+  const data = await res.json();
+  console.log('✅ OK:', data);
 } catch (error) {
   console.error('Offline OK:', error);
 }
 
-                  } catch (error) {
-            console.error('Backend OK local:', error);
-        }
-                
-                const data = await response.json();
-                console.log('Réponse du serveur:', data);
-                
-                
             // Calculer et afficher le profil
             const profile = calculateProfile();
             displayResults(profile);
