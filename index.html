@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Succession - Quelle est la meilleure manière d'avancer sereinement ?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: 0%;
+            transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .content {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .emoji {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            display: block;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: #34495e;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .question-counter {
+            background: #667eea;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 25px;
+            display: inline-block;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .option {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            text-align: left;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .final-cta {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            margin-top: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+        }
+
+        .privacy-note {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 3px solid #3498db;
+        }
+
+        .intro-list {
+            text-align: left;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .intro-list ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .intro-list li {
+            padding: 8px 0;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .intro-list li::before {
+            content: '✅';
+            position: absolute;
+            left: 0;
+            top: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            .option {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="content">
+            <!-- Page d'accueil -->
+            <div class="page active" id="intro">
+                <span class="emoji">🏠</span>
+                <h1>Succession : quelle est la meilleure manière d'avancer sereinement avec votre maison héritée ?</h1>
+                <p class="subtitle">La perte d'un proche est déjà une épreuve difficile. Quand un bien immobilier s'ajoute à la succession, les émotions et les contraintes administratives peuvent devenir un véritable fardeau.</p>
+                
+                <div class="intro-list">
+                    <p style="font-weight: 500; margin-bottom: 15px;">Ce quiz a pour but de vous offrir un premier éclairage sur votre situation. En quelques questions simples, vous obtiendrez un bilan adapté à votre contexte :</p>
+                    <ul>
+                        <li>êtes-vous prêt à vendre rapidement ?</li>
+                        <li>avez-vous besoin de temps ?</li>
+                        <li>ou plutôt d'un accompagnement pour débloquer une situation familiale ?</li>
+                    </ul>
+                </div>
+                
+                <p style="color: #e67e22; font-weight: 500; margin: 20px 0;"><strong>⚠️ Répondez en toute sincérité : vos réponses resteront confidentielles.</strong></p>
+                <button class="btn" onclick="startQuiz()">Commencer le quiz (2 minutes)</button>
+            </div>
+
+            <!-- Questions du quiz -->
+            <div class="page" id="question1">
+                <div class="question-counter">Question 1 / 7</div>
+                <h2 class="question-text">Quand vous pensez à ce bien hérité, quel sentiment domine ?</h2>
+                <div class="options">
+                    <div class="option" data-value="attachment" onclick="selectOption(this, 1)">
+                        💝 Attachement affectif
+                    </div>
+                    <div class="option" data-value="stress" onclick="selectOption(this, 1)">
+                        😰 Stress lié aux démarches
+                    </div>
+                    <div class="option" data-value="relief" onclick="selectOption(this, 1)">
+                        😌 Soulagement à l'idée de tourner la page
+                    </div>
+                </div>
+                <button class="btn" id="next1" onclick="nextQuestion(1)" disabled>Question suivante</button>
+            </div>
+
+            <div class="page" id="question2">
+                <div class="question-counter">Question 2 / 7</div>
+                <h2 class="question-text">Combien d'héritiers sont impliqués dans cette succession ?</h2>
+                <div class="options">
+                    <div class="option" data-value="alone" onclick="selectOption(this, 2)">
+                        👤 Je suis seul(e)
+                    </div>
+                    <div class="option" data-value="agreement" onclick="selectOption(this, 2)">
+                        👥 Nous sommes plusieurs mais en accord
+                    </div>
+                    <div class="option" data-value="disagreement" onclick="selectOption(this, 2)">
+                        ⚡ Nous sommes plusieurs et il y a des désaccords
+                    </div>
+                </div>
+                <button class="btn" id="next2" onclick="nextQuestion(2)" disabled>Question suivante</button>
+            </div>
+
+            <div class="page" id="question3">
+                <div class="question-counter">Question 3 / 7</div>
+                <h2 class="question-text">Le bien est actuellement :</h2>
+                <div class="options">
+                    <div class="option" data-value="inhabited" onclick="selectOption(this, 3)">
+                        🏡 Habité par un héritier
+                    </div>
+                    <div class="option" data-value="maintained" onclick="selectOption(this, 3)">
+                        🧹 Vide mais entretenu
+                    </div>
+                    <div class="option" data-value="expensive" onclick="selectOption(this, 3)">
+                        💸 Vide et coûte cher en entretien/taxes
+                    </div>
+                    <div class="option" data-value="rented" onclick="selectOption(this, 3)">
+                        🏠 Loué
+                    </div>
+                </div>
+                <button class="btn" id="next3" onclick="nextQuestion(3)" disabled>Question suivante</button>
+            </div>
+
+            <div class="page" id="question4">
+                <div class="question-counter">Question 4 / 7</div>
+                <h2 class="question-text">Avez-vous déjà échangé avec vos proches sur la possibilité de vendre ?</h2>
+                <div class="options">
+                    <div class="option" data-value="agreed" onclick="selectOption(this, 4)">
+                        ✅ Oui, et tout le monde est d'accord
+                    </div>
+                    <div class="option" data-value="divergent" onclick="selectOption(this, 4)">
+                        🤔 Oui, mais il y a des divergences
+                    </div>
+                    <div class="option" data-value="notyet" onclick="selectOption(this, 4)">
+                        ❓ Pas encore
+                    </div>
+                </div>
+                <button class="btn" id="next4" onclick="nextQuestion(4)" disabled>Question suivante</button>
+            </div>
+
+            <div class="page" id="question5">
+                <div class="question-counter">Question 5 / 7</div>
+                <h2 class="question-text">Dans quel délai aimeriez-vous que cette situation trouve une issue ?</h2>
+                <div class="options">
+                    <div class="option" data-value="quickly" onclick="selectOption(this, 5)">
+                        ⚡ Rapidement (1 à 3 mois)
+                    </div>
+                    <div class="option" data-value="months" onclick="selectOption(this, 5)">
+                        📅 D'ici quelques mois
+                    </div>
+                    <div class="option" data-value="nohurry" onclick="selectOption(this, 5)">
+                        🕐 Pas d'urgence
+                    </div>
+                </div>
+                <button class="btn" id="next5" onclick="nextQuestion(5)" disabled>Question suivante</button>
+            </div>
+
+            <div class="page" id="question6">
+                <div class="question-counter">Question 6 / 7</div>
+                <h2 class="question-text">Selon vous, quel est le plus gros obstacle aujourd'hui ?</h2>
+                <div class="options">
+                    <div class="option" data-value="emotional" onclick="selectOption(this, 6)">
+                        💔 L'attachement émotionnel
+                    </div>
+                    <div class="option" data-value="administrative" onclick="selectOption(this, 6)">
+                        📋 Les démarches administratives/juridiques
+                    </div>
+                    <div class="option" data-value="disagreement" onclick="selectOption(this, 6)">
+                        👥 Le manque d'accord entre héritiers
+                    </div>
+                    <div class="option" data-value="time" onclick="selectOption(this, 6)">
+                        ⏰ Le manque de temps
+                    </div>
+                </div>
+                <button class="btn" id="next6" onclick="nextQuestion(6)" disabled>Question suivante</button>
+            </div>
+
+            <div class="page" id="question7">
+                <div class="question-counter">Question 7 / 7</div>
+                <h2 class="question-text">Seriez-vous prêt(e) à échanger gratuitement avec un conseiller pour trouver des solutions adaptées à votre famille ?</h2>
+                <div class="options">
+                    <div class="option" data-value="yes" onclick="selectOption(this, 7)">
+                        😊 Oui, avec plaisir
+                    </div>
+                    <div class="option" data-value="maybe" onclick="selectOption(this, 7)">
+                        🤔 Peut-être, j'aimerais en savoir plus
+                    </div>
+                    <div class="option" data-value="no" onclick="selectOption(this, 7)">
+                        🚫 Non, pas pour le moment
+                    </div>
+                </div>
+                <button class="btn" id="next7" onclick="nextQuestion(7)" disabled>Voir mes résultats</button>
+            </div>
+
+            <!-- Formulaire de contact -->
+            <div class="page" id="contact">
+                <span class="emoji">🙏</span>
+                <h2>Merci pour vos réponses !</h2>
+                <p class="subtitle">Pour recevoir votre bilan personnalisé, merci de renseigner vos coordonnées :</p>
+                
+                <form id="contactForm" style="text-align: left; max-width: 500px; margin: 0 auto;">
+                    <div style="margin-bottom: 20px;">
+                        <label for="fullName" style="display: block; margin-bottom: 8px; font-weight: 500;">Nom & Prénom *</label>
+                        <input type="text" id="fullName" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="phone" style="display: block; margin-bottom: 8px; font-weight: 500;">Numéro de téléphone *</label>
+                        <input type="tel" id="phone" required style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <label for="address" style="display: block; margin-bottom: 8px; font-weight: 500;">Adresse du bien à estimer (facultatif)</label>
+                        <input type="text" id="address" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem;">
+                    </div>
+                    
+                    <button type="submit" class="btn" style="width: 100%;">✅ Valider et recevoir mes résultats</button>
+                </form>
+                
+                <div class="privacy-note">
+                    🔒 Vos données sont confidentielles et uniquement utilisées pour vous transmettre votre bilan.
+                </div>
+            </div>
+
+            <!-- Page de résultats -->
+            <div class="page" id="results">
+                <span class="emoji">📊</span>
+                <h2>Votre bilan personnalisé</h2>
+                <div id="resultContent" style="text-align: left; margin: 30px 0;"></div>
+                
+                <div class="final-cta">
+                    <h3>🎁 Pour aller plus loin, nous vous offrons :</h3>
+                    <ul style="margin-top: 15px; list-style-position: inside;">
+                        <li>Un entretien gratuit et confidentiel (30 min) pour parler de votre situation</li>
+                        <li>Une estimation claire et sans engagement de la valeur de votre bien</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        const answers = {};
+
+        const profiles = {
+            "Le Cœur partagé": {
+                emoji: "💝",
+                description: "Vous êtes encore très attaché(e) au bien hérité. Ce logement évoque des souvenirs, une histoire familiale, parfois même une présence affective forte. Vous ressentez un mélange d'amour, de nostalgie, mais aussi de culpabilité à l'idée de 'tourner la page'.",
+                implications: "Vous n'êtes pas encore dans une démarche de vente immédiate. Les décisions peuvent être retardées par l'émotionnel. Vous risquez de laisser le bien se dégrader ou de supporter des frais inutiles (taxes, entretien).",
+                message: "Prenez le temps de la réflexion, mais entourez-vous d'informations claires. Un conseiller peut vous aider à poser les bases sans vous mettre sous pression.",
+                cta: "📊 Demandez dès maintenant votre estimation gratuite et sans engagement",
+                ctaAction: "redirectToCalendar()"
+            },
+            "Le Médiateur": {
+                emoji: "🤝",
+                description: "Vous êtes confronté(e) à des désaccords familiaux. Certains héritiers veulent vendre, d'autres non. Il y a des tensions, des divergences de points de vue. Vous êtes peut-être au cœur de ces conflits, ou vous cherchez à trouver un équilibre.",
+                implications: "Les décisions peuvent être bloquées. Les frais continuent à s'accumuler. Le bien peut se dégrader. Les relations familiales peuvent se détériorer davantage.",
+                message: "Vous avez besoin d'un tiers impartial pour débloquer la situation. Un conseiller spécialisé en succession peut aider à trouver des solutions acceptables pour tous.",
+                cta: "🤝 Trouvez des solutions avec l'aide d'un expert",
+                ctaAction: "bookConsultation()"
+            },
+            "Le Décidé": {
+                emoji: "⚡",
+                description: "Vous savez ce que vous voulez : vendre rapidement et tourner la page. Vous n'êtes pas émotionnellement attaché(e) au bien et vous voyez la vente comme une solution pratique et financière.",
+                implications: "Vous êtes prêt(e) à agir, mais vous devez vous assurer que tous les héritiers sont d'accord. Il faut respecter les délais légaux et les formalités.",
+                message: "Agissez avec méthode. Obtenez une estimation professionnelle, préparez les documents, et lancez le processus de vente.",
+                cta: "⚡ Lancez votre processus de vente dès maintenant",
+                ctaAction: "redirectToCalendar()"
+            },
+            "Le Prudent": {
+                emoji: "🕐",
+                description: "Vous n'êtes pas pressé(e). Vous prenez du recul et vous ne voulez pas vous précipiter. Vous êtes peut-être en attente de clarté, ou vous préférez laisser le temps faire son œuvre.",
+                implications: "Vous avez le luxe du temps, mais attention : les frais continuent à s'accumuler (taxes, entretien, assurance). Un bien inoccupé peut se dégrader.",
+                message: "Utilisez ce temps pour vous informer, consulter un expert, et préparer votre stratégie sans précipitation.",
+                cta: "🕐 Planifiez votre succession sereinement",
+                ctaAction: "redirectToCalendar()"
+            }
+        };
+
+        function startQuiz() {
+            currentQuestion = 1;
+            updateProgress();
+            showPage('question1');
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function updateProgress() {
+            const progress = (currentQuestion / 7) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function selectOption(element, questionNum) {
+            // Désélectionner toutes les options de cette question
+            const options = element.parentNode.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Sélectionner l'option cliquée
+            element.classList.add('selected');
+            
+            // Sauvegarder la réponse
+            answers[`q${questionNum}`] = element.dataset.value;
+            
+            // Activer le bouton suivant
+            document.getElementById(`next${questionNum}`).disabled = false;
+        }
+
+        function nextQuestion(currentNum) {
+            currentQuestion = currentNum + 1;
+            updateProgress();
+            
+            if (currentNum < 7) {
+                showPage(`question${currentNum + 1}`);
+            } else {
+                showPage('contact');
+            }
+        }
+
+        function calculateProfile() {
+            let profile = "Le Cœur partagé"; // Profil par défaut
+            
+            // Logique de calcul du profil basée sur les réponses
+            const hasDisagreement = answers.q2 === 'disagreement' || answers.q4 === 'divergent';
+            const isEmotionallyAttached = answers.q1 === 'attachment' || answers.q6 === 'emotional';
+            const wantsQuickSale = answers.q5 === 'quickly' && answers.q1 === 'relief';
+            const hasUrgency = answers.q5 === 'quickly';
+            const noUrgency = answers.q5 === 'nohurry';
+            
+            if (hasDisagreement) {
+                profile = "Le Médiateur";
+            } else if (wantsQuickSale && !isEmotionallyAttached) {
+                profile = "Le Décidé";
+            } else if (noUrgency && !isEmotionallyAttached) {
+                profile = "Le Prudent";
+            } else if (isEmotionallyAttached) {
+                profile = "Le Cœur partagé";
+            }
+            
+            return profile;
+        }
+
+        function displayResults(profileName) {
+            const profileData = profiles[profileName];
+            document.getElementById('resultContent').innerHTML = `
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 15px; border-left: 5px solid #667eea;">
+                    <h3 style="font-size: 1.8rem; margin-bottom: 15px;">${profileData.emoji} ${profileName}</h3>
+                    <div style="margin-bottom: 20px; line-height: 1.8;">
+                        ${profileData.description}
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <strong>Ce que cela implique :</strong>
+                        <div style="margin-top: 10px; padding: 15px; background: white; border-radius: 10px;">
+                            ${profileData.implications}
+                        </div>
+                    </div>
+                    <div class="result-message"><strong>Conseil adapté :</strong> 👉 ${profileData.message}</div>
+                    <button class="cta-button" onclick="${profileData.ctaAction}" style="margin-top: 15px;">
+                        ${profileData.cta}
+                    </button>
+                </div>
+            `;
+        }
+
+        // Gestion du formulaire de contact
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fullName = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const address = document.getElementById('address').value;
+            
+            // Envoyer les données au backend
+            try {
+                const response = await fetch('https://3000-ii2seqp9tho7x050j9483-eb847b98.us2.manus.computer/api/trpc/quiz.submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        json: {
+                            fullName: fullName,
+                            phone: phone,
+                            address: address || null,
+                            q1_sentiment: answers.q1 || null,
+                            q2_heirs: answers.q2 || null,
+                            q3_property_state: answers.q3 || null,
+                            q4_family_discussion: answers.q4 || null,
+                            q5_timeline: answers.q5 || null,
+                            q6_obstacle: answers.q6 || null,
+                            q7_consultation: answers.q7 || null
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('Réponse du serveur:', data);
+                
+                // Vérifier si la réponse est correcte
+                if (!data.result || !data.result.data || !data.result.data.success) {
+                    console.error('Erreur lors de l\'envoi des données');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'envoi:', error);
+            }
+            
+            // Calculer et afficher le profil
+            const profile = calculateProfile();
+            displayResults(profile);
+            
+            // Mettre à jour la progress bar à 100%
+            document.getElementById('progressFill').style.width = '100%';
+            
+            // Afficher la page de résultats avec un délai pour l'animation
+            setTimeout(() => {
+                showPage('results');
+            }, 500);
+        });
+
+        // Fonctions pour les CTA
+        function redirectToCalendar() {
+            window.location.href = 'https://cal.com/lucie-garnier-immobilier/rendez-vous-succession-quiz';
+        }
+
+        function bookConsultation() {
+            window.location.href = 'https://cal.com/lucie-garnier-immobilier/rendez-vous-succession-quiz';
+        }
+
+        // Initialisation
+        updateProgress();
+    </script>
+</body>
+</html>
