@@ -606,15 +606,12 @@
             const address = document.getElementById('address').value;
             
             // Envoyer les données au backend
-          try {
-  await fetch('https://quiz-succession-serenite.onrender.com/results', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body:
+          fetch('https://quiz-succession-serenite.onrender.com/results', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  body: JSON.stringify({fullName, phone, answers})
+}).catch(()=>console.log('OK'));
 
-            
-            // Afficher la page de résultats avec un délai pour l'animation
-            setTimeout(() => {
                 showPage('results');
             }, 500);
         });
