@@ -628,6 +628,13 @@
         function bookConsultation() {
             window.location.href = 'https://cal.com/lucie-garnier-immobilier/rendez-vous-succession-quiz';
         }
+ function showResult() {
+            const score = parseInt(localStorage.getItem('quizScore') || 0);
+            let profil = score <=7 ? "PRUDENT" : score<=14 ? "ÉQUILIBRÉ" : "COMPLEXE";
+            document.getElementById('resultText').innerHTML = 
+                `Profil <strong>${profil}</strong> ! Action prioritaire.`;
+            showPage('resultPage');
+        }
 
         // Initialisation
         updateProgress();
